@@ -1,0 +1,8 @@
+.idea/
+Czateria.log
+Lib/
+Scripts/
+__pycache__/
+debug.log
+pyvenv.cfg
+test.py
