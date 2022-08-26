@@ -44,20 +44,27 @@ class Ciekawostka():
         pytanie = json.loads(pytanie)
         self.kategoria = pytanie['category']
         self.pytanie = pytanie['question']
-        self.odpowiedzi = self.sortuj_odpowiedzi(pytanie['answers'])
         self.poprawna_odpowiedz = pytanie['correctAnswer']
+        self.literka_poprawnej_odpowiedzi = ""
+        self.odpowiedzi = self.sortuj_odpowiedzi(pytanie['answers'])
 
+    def sortuj_odpowiedzi(self, odpowiedzi):
+        output = ""
+        alphabet = ['A', 'B', 'C', 'D', 'E', 'F']
+        for i, odpowiedz in enumerate(odpowiedzi.keys()):
+            
+            if self.poprawna_odpowiedz in odpowiedzi[odpowiedz]:
+                self.literka_poprawnej_odpowiedzi = odpowiedz
+            output += f"{alphabet[i]}. {odpowiedzi[odpowiedz]} | "
+        return output[:-2]
+
+    def print_all(self):
         print(self.kategoria)
         print(self.pytanie)
         print(self.odpowiedzi)
         print(self.poprawna_odpowiedz)
-            
-    def sortuj_odpowiedzi(self, odpowiedzi):
-        output = ""
-        for odpowiedz in odpowiedzi.keys():
-            output += f"{odpowiedzi[odpowiedz]} | "
-        return output[:-2]
+        print(self.literka_poprawnej_odpowiedzi)
 
 ciekawostka = Ciekawostka()
-
 ciekawostka.site('zabawa')
+ciekawostka.print_all()
