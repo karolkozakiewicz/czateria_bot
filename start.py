@@ -196,9 +196,9 @@ class Czateria:
                                                         "//input[@value='Wyślij']")
 
         for letter in message:
-            time.sleep(0.025)
+            time.sleep(random.uniform(0.025, 0.053))
             input_area.send_keys(letter)
-        time.sleep(timeout)
+        time.sleep(timeout*2)
         send_button.click()
 
     def get_string_messages(self, messages):
@@ -370,15 +370,11 @@ class Czateria:
         return zdanie
 
     def check_if_bot_command(self, nick, text):
-        message = text.split(' ')
-        print(len(message))
+        message = text.split(' ')[1:]
         try:
             if 'quiz' in message[0].lower():
-                print('quiz in text[0].lower()')
                 if len(message) > 1:
-                    print('len(message) > 1')
                     if 'losuj' in message[1].lower():
-                        print('losuj in text[1].lower()')
                         self.ciekawostka.get_question()
                         zdanie = f"{self.ciekawostka.odpowiedzi}"
                         self.chat_send_message(f"{self.ciekawostka.kategoria}. {self.ciekawostka.pytanie}")
@@ -386,9 +382,12 @@ class Czateria:
 
                     if 'odpowiedz' in message[1].lower():
                         if len(message) > 2:
-                            if any('A', 'B', 'C', 'D') in message[2].lower():
+                            if message[2].lower() in ['A', 'B', 'C', 'D', 'a', 'b', 'c', 'd']:
                                 if self.ciekawostka.sprawdz_odpowiedz(message[2].lower()):
                                     self.chat_send_message('Poprawna odpowiedź :)')
+
+                                else:
+                                    self.chat_send_message('Zła odpowiedź :(')
 
 
 
@@ -462,9 +461,9 @@ class Czateria:
                 
 
 
-# czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,247,Psychologia')
+czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,247,Psychologia')
 # czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,311,M%C4%99%C5%BCowie%20i%20%C5%BCony')
-czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,468,Ostr%C3%B3da')
+# czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,468,Ostr%C3%B3da')
 # czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,74,%C5%81%C3%B3d%C5%BA')
 czateria.start_chat()
 
