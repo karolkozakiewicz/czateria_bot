@@ -28,12 +28,19 @@ class Ciekawostka():
     def update_api(self):
         self.API = f"https://trivia.psycatgames.com/get-question?category={self.aktualna_kategoria}&lang=pl"     
 
-    def site(self, kategoria):
+    def get_question(self, kategoria=None):
+        if kategoria == None:
+            try:
+                kategoria = random.choice([i for i in self.kategorie.keys()])
+            except:
+                kategoria = 'lifestyle'
+
         self.aktualna_kategoria = kategoria
         self.update_api()
         try:
             question_json = requests.get(self.API).text
         except:
+            print('Blad przy kategoriach')
             random_kategoria = random.choice([i for i in self.kategorie.keys()])
             self.aktualna_kategoria = random_kategoria
             question_json = requests.get(self.API).text
@@ -47,6 +54,10 @@ class Ciekawostka():
         self.poprawna_odpowiedz = pytanie['correctAnswer']
         self.literka_poprawnej_odpowiedzi = ""
         self.odpowiedzi = self.sortuj_odpowiedzi(pytanie['answers'])
+
+    def sprawdz_odpowiedz(self, odpowiedz):
+        if odpowiedz == self.literka_poprawnej_odpowiedzi:
+            return True
 
     def sortuj_odpowiedzi(self, odpowiedzi):
         output = ""
@@ -65,6 +76,3 @@ class Ciekawostka():
         print(self.poprawna_odpowiedz)
         print(self.literka_poprawnej_odpowiedzi)
 
-ciekawostka = Ciekawostka()
-ciekawostka.site('zabawa')
-ciekawostka.print_all()

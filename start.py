@@ -14,7 +14,7 @@ import datetime
 #import pika
 import threading
 import wx
-
+from ciekawostka import Ciekawostka
 
 logging.basicConfig(level=logging.INFO, filemode='a', datefmt='%Y-%m-%d %H:%M:%S',
                     format='%(levelname)s : %(asctime)s : %(message)s',
@@ -49,6 +49,7 @@ class Czateria:
         self.guimessages = []
         self._get_frame_count_crash = 0
         self._main_loop_count_crash = 0
+        self.ciekawostka = Ciekawostka()
 
     @staticmethod
     def chrome_options():
@@ -346,7 +347,7 @@ class Czateria:
         try:
             
             self.chat_frame = self.get_chat_frame()
-            self.greeting(True)
+            self.greeting(False)
             self.load_people_list()
             self.main()
         except Exception as e:
@@ -368,10 +369,36 @@ class Czateria:
         zdanie = random.choice(poczatek_zdania) + ' ' +random.choice(przymiotnik) + ' ' + random.choice(rzeczownik) + '. ' + random.choice(koncowka)
         return zdanie
 
+    def check_if_bot_command(self, nick, text):
+        message = text.split(' ')
+        print(len(message))
+        try:
+            if 'quiz' in message[0].lower():
+                print('quiz in text[0].lower()')
+                if len(message) > 1:
+                    print('len(message) > 1')
+                    if 'losuj' in message[1].lower():
+                        print('losuj in text[1].lower()')
+                        self.ciekawostka.get_question()
+                        zdanie = f"{self.ciekawostka.odpowiedzi}"
+                        self.chat_send_message(f"{self.ciekawostka.kategoria}. {self.ciekawostka.pytanie}")
+                        self.chat_send_message(zdanie)
+
+                    if 'odpowiedz' in message[1].lower():
+                        if len(message) > 2:
+                            if any('A', 'B', 'C', 'D') in message[2].lower():
+                                if self.ciekawostka.sprawdz_odpowiedz(message[2].lower()):
+                                    self.chat_send_message('Poprawna odpowiedź :)')
+
+
+
+        except Exception as e:
+            print(e)
+
 
     def main(self):
-        crash = False;
-        crash_count = 0;
+        crash = False
+        crash_count = 0
         while True:
             """
             This loop refreshes chat and do all the work
@@ -394,6 +421,7 @@ class Czateria:
                     self.nickname_add(nick)
                     someone_enter_or_left_chat_message = self.enter_left_check(messages[-1].split(' '))
                     message = self.format_message(message)
+                    
                     # Statement checks if phrase 'enter' or 'left' is in message.
                     if someone_enter_or_left_chat_message is False:
                         if len(self.format_message(self.get_nick_message(messages[-1].split(' '))[1])) > 0:
@@ -401,10 +429,11 @@ class Czateria:
                             if self.MY_NICK.lower() not in nick.lower():
                                 # If i'm not author of the message.
                                 if self.MY_NICK.lower() in message.lower():
+                                    self.check_if_bot_command(nick, message)
                                     # If someone mentioned me.
                                     try:
                                         print(f'{nick} : {message}')
-                                        self.chat_send_message(self.pick_insult())
+                                        # self.chat_send_message(self.pick_insult())
                                     except Exception as e:
                                         print(e)
                                         print("Couldn't send message to bot[0]")
@@ -412,10 +441,12 @@ class Czateria:
                                     # If noone mentioned me, just send message to the bot without replying on chat.
                                     try:
                                         print(f'{nick} : {message}')
-                                        
+
                                     except Exception as e:
                                         print(e)
                                         print("Couldn't send message to bot [1]")
+                            
+                                
 
                 # print(f"\n{(datetime.datetime.now()-data1)} Zakonczona pętla. Usuwanie zakończonych wątków")
                 self.destroy_inactive_thread()
@@ -431,8 +462,9 @@ class Czateria:
                 
 
 
-czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,247,Psychologia')
-# czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,468,Ostr%C3%B3da')
+# czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,247,Psychologia')
+# czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,311,M%C4%99%C5%BCowie%20i%20%C5%BCony')
+czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,468,Ostr%C3%B3da')
 # czateria = Czateria('Pam_Bot', 'misiek08', 'https://czateria.interia.pl/emb-chat,room,74,%C5%81%C3%B3d%C5%BA')
 czateria.start_chat()
 
